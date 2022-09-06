@@ -1,16 +1,21 @@
-#include <string>
+// extract to string
 #include <iostream>
+#include <string>
+#include <sstream>
 
-using namespace std;
-
-
-
-
-
-int main(int argc, char const *argv[])
+int main ()
 {
-    string str;
-    cin >> str;
-    
-    return 0;
+  std::string str;
+
+  std::cout << "Please, enter your full name: ";
+  std::getline (std::cin,str);
+  std::cout << str << std::endl;
+  std::stringstream ss(str);
+  
+  std::string name;
+  while(std::getline(ss, name, ',')) {
+    std::cout << "Hello, " << name << "!" << std::endl;
+  }
+  //std::cout << "Hello, " << str << "!\n";
+  return 0;
 }
