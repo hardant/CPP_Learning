@@ -1,5 +1,6 @@
 #include <iostream>
 #include "../header/speechManager.hpp"
+#include "../header/utils.hpp"
 
 using namespace std;
 
@@ -19,15 +20,11 @@ int main(int argc, char const *argv[])
 
   while(true) {
     sm.show_menu();
-    int selection = 0;
-    cout << "请输入您的选择:";
-    cin >> selection;
-    cout << "--------------------------------***" << selection << endl;
-    /*
+    int selection = standardIn<int>("请输入您的选择:");
+    
     switch (selection)
     {
     case 1: // 开始比赛
-      cout << "--------=======================***" << endl;
       sm.start_game();
       break;
     case 2: // 查看往期结果
@@ -42,7 +39,7 @@ int main(int argc, char const *argv[])
     default:
       break;
     }
-    */
+    
   }
   return 0;
 }

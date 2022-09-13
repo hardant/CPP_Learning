@@ -33,6 +33,8 @@ class SpeechManager {
     void start_game();
     // 抽签
     void speechDraw();
+    // 比赛
+    void speechContest();
     void show_history();
     void empty_history();
     void exitSystem();
