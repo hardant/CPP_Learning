@@ -35,6 +35,8 @@ class SpeechManager {
     void speechDraw();
     // 比赛
     void speechContest();
+    // 显示比赛成绩
+    void show_score();
     void show_history();
     void empty_history();
     void exitSystem();

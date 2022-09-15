@@ -3,6 +3,7 @@
 #include <deque>
 #include <functional>
 #include <numeric>
+#include <time.h>
 
 SpeechManager::SpeechManager() {
   this->init_speech();
@@ -14,6 +15,7 @@ SpeechManager::~SpeechManager() {
 }
 
 void SpeechManager::init_speech(){
+  cout << "clear" << endl;
   v1.clear();
   v2.clear();
   v3.clear();
@@ -26,7 +28,6 @@ void SpeechManager::createSpeaker() {
   for (int i = 0; i < nameSeed.size(); i++) {
     string name = "选手";
     name += nameSeed[i];
-    cout << name << endl;
     Speaker sp;
     sp.m_name = name;
     // 两轮比赛的成绩都初始化为0
@@ -34,8 +35,7 @@ void SpeechManager::createSpeaker() {
     sp.m_score[1] = 0;
     // 创建选手编号
     v1.push_back(10001 + i);
-    
-    m_speaker.insert(make_pair(10001 + 1, sp));
+    m_speaker.insert(make_pair(10001 + i, sp));
   }
 }
 
@@ -48,19 +48,24 @@ void SpeechManager::show_menu() {
   cout << "*********************" << "******************" << "*********************" << endl;
 }
 
+int myrandom(int i) {
+  return rand() % i;
+}
+
 void SpeechManager::speechDraw () {
   cout << "第" << this->m_index << "轮演讲比赛正在抽签" << endl;
   cout << "---------------------" << endl;
   cout << "抽签结果如下:" << endl;
   if (this->m_index == 1) {
     // 第一轮比赛
+    srand(time(NULL));
     random_shuffle(v1.begin(), v1.end());
     for(vector<int>::iterator it = v1.begin(); it != v1.end(); it++) {
       cout << *it << ",";
     }
     cout << endl;
   } else {
-    // 第一轮比赛
+    // 第二轮比赛
     random_shuffle(v2.begin(), v2.end());
     for(vector<int>::iterator it = v2.begin(); it != v2.end(); it++) {
       cout << *it << ",";
@@ -81,6 +86,8 @@ void SpeechManager::speechContest() {
     v_src = v2;
   }
   int num = 0;
+  multimap<double, int, greater<double> > vectory_map;
+  multimap<double, int, greater<double> > groupmap;
   for (vector<int>::iterator it = v_src.begin(); it != v_src.end(); it++) {
     num++;
     // 评委打分
@@ -98,40 +105,75 @@ void SpeechManager::speechContest() {
     double avg_score = score_sum/(double)score_deque.size();
     this->m_speaker[*it].m_score[m_index-1] = avg_score;
     // 小组比赛结果
-    multimap<double, int> groupmap;
-
-    cout << "---------" << avg_score << "=>" << *it << endl;
     groupmap.insert(make_pair(avg_score, *it));
-    cout << "num:" << num << endl;
     if (num % 6 == 0) { // 一个小组比赛完成
-      cout << "第" << num / 6 << "个小组的比赛成绩为:" << endl;
-
-      cout << "groupmap.size:" << groupmap.size() << endl;
+      if (m_index == 1) {
+        cout << "第" << num / 6 << "个小组的比赛成绩为:" << endl;
+      } else {
+        cout << "总决赛赛成绩为:" << endl;
+      }
+      int r = 0;
       for (multimap<double, int>::iterator git = groupmap.begin(); git != groupmap.end(); git++) {
+        if (r++ < 3) {
+          vectory_map.insert(make_pair(git->first, git->second));
+        } 
         cout << git->second << "=>" << git->first << endl;
       }
+      groupmap.clear();
       cout << "按任意键继续比赛" << endl;
       getchar();
     }
   }
 
-  
 
 
+  for(multimap<double, int>::iterator vit = vectory_map.begin(); vit != vectory_map.end(); vit++) {
+    if (m_index == 1) {
+      v2.push_back(vit->second);
+    } else {
+      v3.push_back(vit->second);
+    }
+    
+  }
   
 }
 
+void SpeechManager::show_score() {
+  vector<int> v;
+  if (m_index == 1) {
+    v = v2;
+  } else {
+    v = v3;
+  }
+  cout << "-------第" << m_index << "轮比赛的胜出的选手有:-------" << endl;
+  for (vector<int>::iterator it = v.begin(); it != v.end(); it++) {
+    cout << "编号: " << *it << ",姓名: " << m_speaker[*it].m_name << ",成绩: " << m_speaker[*it].m_score[m_index-1] << endl;
+  }
+
+  cout << "按任意键继续比赛" << endl;
+  getchar();
+}
+
 void SpeechManager::start_game() {
+
+  v2.clear();
+  v3.clear();
+  m_index = 1;
   // 第一轮比赛
   // 1. 抽签
   this->speechDraw();
   // 2. 比赛
   this->speechContest();
   // 3. 显示最终结果
-  // 第一轮比赛
+  show_score();
+  // 第二轮比赛
   // 1. 抽签
+  this->m_index++;
+  this->speechDraw();
   // 2. 比赛
+  this->speechContest();
   // 3. 显示最终结果
+  show_score();
   // 4. 保存最终分数到文件中
 
 }
