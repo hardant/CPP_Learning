@@ -37,6 +37,10 @@ class SpeechManager {
     void speechContest();
     // 显示比赛成绩
     void show_score();
+    // 保存成绩
+    void save_record();
+
+    // 查看往期结果
     void show_history();
     void empty_history();
     void exitSystem();

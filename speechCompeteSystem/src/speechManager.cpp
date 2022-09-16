@@ -4,6 +4,9 @@
 #include <functional>
 #include <numeric>
 #include <time.h>
+#include <fstream>
+
+#define OUTPUT_FILE "speech.csv"
 
 SpeechManager::SpeechManager() {
   this->init_speech();
@@ -154,6 +157,20 @@ void SpeechManager::show_score() {
   getchar();
 }
 
+void SpeechManager::save_record() {
+
+  ofstream ofs;
+  ofs.open(OUTPUT_FILE, ios::app);// 追加方式打开
+  // 写入数据
+  for (vector<int>::iterator it = v3.begin(); it != v3.end(); it++) {
+    ofs << *it << ",";
+    ofs << m_speaker[*it].m_name << ",";
+    ofs << m_speaker[*it].m_score[1] << ",";
+  }
+  ofs << endl;
+  ofs.close();
+}
+
 void SpeechManager::start_game() {
 
   v2.clear();
@@ -175,13 +192,70 @@ void SpeechManager::start_game() {
   // 3. 显示最终结果
   show_score();
   // 4. 保存最终分数到文件中
-
+  save_record();
 }
 void SpeechManager::show_history(){
-  cout << "查看往期结果" << endl;
+  ifstream ifs;
+  ifs.open(OUTPUT_FILE, ios::in);
+  int is_empty = 0;
+  if (!ifs.is_open()) {
+    // 文件不存在
+    is_empty = 1;
+  }
+
+  char c;
+  ifs >> c;
+  if(ifs.eof()) {
+    //文件为空
+    cout << "文件为空" << endl;
+    ifs.close();
+    is_empty = 1;
+  }
+  if (is_empty) {
+    cout << "历史记录为空！" << endl;
+  }
+  ifs.putback(c);
+  // 文件存在，且不为空
+  string record;
+
+  map<int, vector<Speaker> > m_records;
+  int season = 0;
+  while(getline(ifs, record)) {
+    vector<string> v_record = split(record, ",");
+    season++;
+    cout << "第" << season << "届演讲比赛成绩: " << endl;
+    vector<Speaker> v_speakers;
+    int index = 0;
+    for(int i = 0; i < 3; i++) {
+      switch (i)
+      {
+      case 0:
+        cout << "冠军:";
+        break;
+      case 1:
+        cout << "亚军:";
+        break;
+      case 2:
+        cout << "季军:";
+        break;
+      default:
+        break;
+      }
+      cout << endl;
+      int num = stoi(v_record[index++]);
+      string name = v_record[index++];
+      double score = stod(v_record[index++]);
+      cout << "选手编号:" << num << ", 选手姓名:" << name << ", 选手成绩:" << score << endl;
+    }
+  }
 }
 void SpeechManager::empty_history(){
   cout << "清空记录" << endl;
+  ifstream ifs;
+  ifs.open(OUTPUT_FILE, ios::trunc);
+  ifs.clear();
+
+  ifs.close();
 }
 void SpeechManager::exitSystem(){
   cout << "退出系统" << endl;

@@ -22,3 +22,21 @@ T standardIn(string tips) {
     }
   }
 }
+
+std::vector<std::string> split(std::string str, std::string splitor) {
+  int splitor_len = splitor.length();
+  std::size_t found = -1;
+  std::size_t start = 0;
+  found = str.find(splitor, start);
+  std::vector<std::string> strs;
+  while (found != -1) {
+    strs.push_back(str.substr(start, found-start));
+    start = found + splitor_len;
+    if (start >= str.length()) {
+      break;
+    }
+    found = str.find(splitor, start);
+  }
+  strs.push_back(str.substr(start, str.length() - start));
+  return strs;
+}
