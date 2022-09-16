@@ -251,11 +251,10 @@ void SpeechManager::show_history(){
 }
 void SpeechManager::empty_history(){
   cout << "清空记录" << endl;
-  ifstream ifs;
-  ifs.open(OUTPUT_FILE, ios::trunc);
-  ifs.clear();
+  ifstream ofs;
+  ofs.open(OUTPUT_FILE, ios::out|ios::trunc);
 
-  ifs.close();
+  ofs.close();
 }
 void SpeechManager::exitSystem(){
   cout << "退出系统" << endl;
